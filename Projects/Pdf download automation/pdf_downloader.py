@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchWindowException
 
-download_path = "I:\\DOWNLOAD"
+download_path = "G:\\DOWNLOAD"
 
 
 def download_pdf(download_path, start, end, i):
@@ -54,8 +54,13 @@ def download_pdf(download_path, start, end, i):
 
             change = set(after) - set(before)
             if len(change) == 1:
-                file_name = change.pop()
-                file_names[f"{download_path}/{file_name}"] = f"{download_path}/{name} {year} {updated} AnnualActivity.pdf"
+                file_path = f"{download_path}/{change.pop()}"
+                file_root, file_ext = os.path.splitext(file_path)
+                
+                n_file = f"{name} {year} {updated} AnnualActivity"
+                n_file = n_file.replace(':', '-').replace('/', '_')
+                
+                file_names[file_path] = f"{download_path}/{n_file}{file_ext}"
             elif len(change) == 0:
                 print("No file downloaded")
             else:
@@ -78,8 +83,13 @@ def download_pdf(download_path, start, end, i):
 
             change2 = set(after2) - set(before2)
             if len(change2) == 1:
-                file_name = change2.pop()
-                file_names[f"{download_path}/{file_name}"] = f"{download_path}/{name} {year} {updated} AnnualStatement.pdf"
+                file_path = f"{download_path}/{change2.pop()}"
+                file_root, file_ext = os.path.splitext(file_path)
+                
+                n_file = f"{name} {year} {updated} ActivityStatement"
+                n_file = n_file.replace(':', '-').replace('/', '_')
+                
+                file_names[file_path] = f"{download_path}/{n_file}{file_ext}"
             elif len(change2) == 0:
                 print("No file downloaded")
             else:
@@ -110,13 +120,12 @@ def download_pdf(download_path, start, end, i):
         status = "okay"
         
     for key, value in file_names.items():
-        new_file_name = value + ".pdf"
-        os.rename(key, new_file_name)
+        os.rename(key, value)
         
     return i
 
 
-start = 99
+start = 103
 end = 250
 filename = "output.txt"
 j = start
