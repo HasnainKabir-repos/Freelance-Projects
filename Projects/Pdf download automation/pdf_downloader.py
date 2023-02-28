@@ -6,14 +6,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchWindowException
 
-download_path = "C:/Users/User/Downloads"
+download_path = "I:\\DOWNLOAD"
 
 
 def download_pdf(download_path, start, end, i):
     
     global status 
     chrome_options = webdriver.ChromeOptions()
-    prefs = {"profile.default_content_setting_values.automatic_downloads": 1}
+    prefs = {"profile.default_content_setting_values.automatic_downloads": 1,
+            "download.default_directory": download_path,
+            "directory_upgrade": True}
     chrome_options.add_experimental_option("prefs",prefs)
 
     driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -89,7 +91,7 @@ def download_pdf(download_path, start, end, i):
     except StaleElementReferenceException:
         
         driver.quit()
-        print('website crashed at row ' +str(i))
+        print('website crashed at row ' +str(i+1))
     
         status = "crashed"
     except NoSuchWindowException:
@@ -108,13 +110,14 @@ def download_pdf(download_path, start, end, i):
         status = "okay"
         
     for key, value in file_names.items():
-        os.rename(key, value)
+        new_file_name = value + ".pdf"
+        os.rename(key, new_file_name)
         
     return i
 
 
 start = 99
-end = 101
+end = 250
 filename = "output.txt"
 j = start
 
@@ -124,7 +127,7 @@ while j <end:
     
     if status == "crashed":
         with open(filename, 'a') as f:
-            f.write("row number "+ str(j)+" website keeps crashing so skipped\n")
+            f.write("row number "+ str(j+1)+" website keeps crashing so skipped\n")
         j=j+1
         print('Restarting...')
         
@@ -137,7 +140,7 @@ while j <end:
         
         status = ""
         with open(filename, 'a') as f:
-            f.write("row number "+ str(j)+" no pdf\n")
+            f.write("row number "+ str(j+1)+" no pdf\n")
         j=j+1
         continue;
             
