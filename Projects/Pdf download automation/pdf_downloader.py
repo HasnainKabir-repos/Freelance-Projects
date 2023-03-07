@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchWindowException
 
-download_path = "G:\\DOWNLOAD"
+download_path = "I:\\DOWNLOAD"
 
 
 def download_pdf(download_path, start, end, i):
@@ -58,7 +58,7 @@ def download_pdf(download_path, start, end, i):
                 file_root, file_ext = os.path.splitext(file_path)
                 
                 n_file = f"{name} {year} {updated} AnnualActivity"
-                n_file = n_file.replace(':', '-').replace('/', '_')
+                n_file = n_file.replace(':', '-').replace('/', '_').replace('"', '_').replace("'", "_").replace('&', ',')
                 
                 file_names[file_path] = f"{download_path}/{n_file}{file_ext}"
             elif len(change) == 0:
@@ -87,11 +87,12 @@ def download_pdf(download_path, start, end, i):
                 file_root, file_ext = os.path.splitext(file_path)
                 
                 n_file = f"{name} {year} {updated} ActivityStatement"
-                n_file = n_file.replace(':', '-').replace('/', '_')
-                
+                n_file = n_file.replace(':', '-').replace('/', '_').replace('"', '_').replace("'", "_").replace('&', ',')
                 file_names[file_path] = f"{download_path}/{n_file}{file_ext}"
             elif len(change2) == 0:
                 print("No file downloaded")
+                
+                raise Exception
             else:
                 print("More than one file downloaded")
                 
@@ -125,10 +126,10 @@ def download_pdf(download_path, start, end, i):
     return i
 
 
-start = 103
-end = 250
+start = 4
+end = 6
 filename = "output.txt"
-j = start
+j = start-1
 
 while j <end:
     
@@ -149,7 +150,7 @@ while j <end:
         
         status = ""
         with open(filename, 'a') as f:
-            f.write("row number "+ str(j+1)+" no pdf\n")
+            f.write("Problem in row number "+ str(j+1)+"\n")
         j=j+1
         continue;
             
