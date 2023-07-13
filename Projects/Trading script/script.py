@@ -144,7 +144,7 @@ def fillScriptDetails():
                         exch_cell.value = str(exchange)
                         code_cell.value = str(token)
                     except Exception as e:
-                        printf(f'An error occurred when trying to fill Script Code and Exchange column {str(e)}')
+                        print(f'An error occurred when trying to fill Script Code and Exchange column {str(e)}')
 
                 else:
                     print(f'Cannot find information about Script {script} on angelbroking.json')
@@ -156,93 +156,111 @@ def fillScriptDetails():
         print(f'Excel file not found')
     except Exception as e:
         print(f'An error occurred {str(e)}')
-        
 
-data = {}
+
+socket_data = {}
+
+
 def generateScriptInfo(exchange, symbol, token, ltp, obj):
-    if symbol not in data:
+    try:
         LTP = obj.ltpData(exchange, symbol, token)
-        data[symbol] = {
-            "high": LTP["data"]["high"],
-            "low" : LTP["data"]["low"],
-            "open" : LTP["data"]["open"]
-        }
-        
-        return symbol, LTP["data"]["high"],  LTP["data"]["low"], LTP["data"]["open"]
-    
-    else:
-        if float(ltp) >= data[i]["high"]:
-            data[i]["high"] = float(ltp)
-        if float(ltp) <= data[i]["low"]:
-            data[i]["low"] = float(ltp)
+        if symbol not in socket_data:
+            socket_data[symbol] = {
+                "high": LTP["data"]["high"],
+                "low": LTP["data"]["low"],
+                "open": LTP["data"]["open"],
+                "ltp": LTP["data"]["ltp"]
+            }
 
-        return symbol, data[symbol]["high"], data[symbol]["low"], data[i]["open"]
-            
+            return symbol, LTP["data"]["high"], LTP["data"]["low"], LTP["data"]["open"], LTP["data"]["ltp"]
+
+        else:
+            if float(ltp) != socket_data[symbol]["ltp"]:
+                socket_data[symbol]["ltp"] = float(ltp)
+                print(f'Value changed')
+            if float(ltp) >= socket_data[symbol]["high"]:
+                socket_data[symbol]["high"] = float(ltp)
+            if float(ltp) <= socket_data[symbol]["low"]:
+                socket_data[symbol]["low"] = float(ltp)
+
+            print(f'Row changed')
+
+            return symbol, socket_data[symbol]["high"], socket_data[symbol]["low"], socket_data[symbol]["open"], socket_data[symbol]["ltp"]
+
+    except Exception as e:
+        print(f'An error occurred {str(e)}')
 
 
 def sendData(message, obj):
-    
     excel_file = 'order.xlsm'
     sheet1_name = "Sheet1"
-    
+
     try:
         wb = xw.Book(excel_file)
         sheet = wb.sheets[sheet1_name]
-    
-        ltp = message[0]["ltp"]
-        token = message[0]["token"]
-
-        if ltp and token:
-            name, high, low, openx = generateScriptInfo(exchange, name, ltp, obj)
 
         last_row = sheet.range('A' + str(sheet.cells.last_cell.row)).end('up').row
 
         for row in range(2, last_row + 1):
+            name = sheet.range('D' + str(row)).value
+            exchange = sheet.range('F' + str(row)).value
             code = sheet.range('E' + str(row)).value
+            ltp = sheet.range('K' + str(row)).value
 
-            if code and code == token:
+            if name and exchange and code:
+
+                name, high, low, openx, ltp = generateScriptInfo(exchange, name, code, ltp, obj)
+
                 sheet.range('G' + str(row)).value = openx
                 sheet.range('H' + str(row)).value = high
                 sheet.range('I' + str(row)).value = low
                 sheet.range('K' + str(row)).value = ltp
-                
+
+            else:
+                print(f'Row skipped to generate data from socket due to missing values at {row}')
+
         wb.save()
-        
+
     except Exception as e:
-        print(f'An error occurred {str(e)}')   
+        print(f'An error occurred {str(e)}')
     finally:
         check_change_and_order(obj)
-    
+
 
 def generateScriptData(obj):
-    
     excel_file = 'order.xlsm'
     sheet1_name = "Sheet1"
-    
+
     try:
         wb = xw.Book(excel_file)
         sheet = wb.sheets[sheet1_name]
-        
+
         last_row = sheet.range('A' + str(sheet.cells.last_cell.row)).end('up').row
-        
-        for row in range(2, last_row+1):
+
+        for row in range(2, last_row + 1):
             name = sheet.range('D' + str(row)).value
             exchange = sheet.range('F' + str(row)).value
             code = sheet.range('E' + str(row)).value
-            
+
             if name and exchange and code:
                 data = obj.ltpData(exchange, name, code)
 
                 if data['status'] == True:
-
                     sheet.range('G' + str(row)).value = data['data']['open']
                     sheet.range('H' + str(row)).value = data['data']['high']
                     sheet.range('I' + str(row)).value = data['data']['low']
                     sheet.range('J' + str(row)).value = data['data']['close']
                     sheet.range('K' + str(row)).value = data['data']['ltp']
 
+                    socket_data[name] = {
+                        "high": data["data"]["high"],
+                        "low": data["data"]["low"],
+                        "open": data["data"]["open"],
+                        "ltp": data["data"]["ltp"]
+                    }
+
         wb.save()
-        
+
     except Exception as e:
         print(f'An error occurred {str(e)}')
 
@@ -285,16 +303,13 @@ def check_change_and_order(obj):
         print(f'An error occurred: {str(e)}')
 
 
-
-
-
 def ordermanagement(transactionType, row, sheet, obj):
     tradingsymbol = sheet.range('D' + str(row)).value
     symboltoken = sheet.range('E' + str(row)).value
     exchange = sheet.range('F' + str(row)).value
     ordertype = sheet.range('O' + str(row)).value
     producttype = sheet.range('M' + str(row)).value
-    price = sheet.range('K' + str(row)).value
+    price = sheet.range('U' + str(row)).value
     quantity = sheet.range('L' + str(row)).value
     squareoff = sheet.range('S' + str(row)).value
     stoploss = sheet.range('T' +  str(row)).value
