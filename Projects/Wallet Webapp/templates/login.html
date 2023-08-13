@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Roboto+Mono:ital,wght@600&display=swap" rel="stylesheet">
+    <title>Login Authentication</title>
+</head>
+<body>
+    <div class="center">
+        <div class="label">
+            <h1 class="title">Deriv API</h1>
+            <h2 class="subtitle">Custom Wallet</h2>
+        </div>
+
+        <div class="login-card">
+            <form action="" method="POST" class="form-container">
+                {{form.hidden_tag()}}
+                <div class="api">
+                    <h2>API Token:</h2>
+                    {{form.api_key}}
+                </div>
+                <div class="appId">
+                    <h2>APP ID:</h2>
+                    {{form.app_id}}
+                </div>
+
+                <div class="save">
+                    {{form.submit}}
+                </div>
+
+                <div class="view">
+                    
+                </div>
+
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="spinner"></div>
+                </div>
+            </form>
+        </div>
+
+            <!-- Modal -->
+        <div id="authorizationModal" class="modal">
+            <div class="modal-content">
+                <span id = "close" class="close">&times;</span>
+                <p>Authorization Successful</p>
+            </div>
+        </div>
+
+    </div>
+    
+    {% if hide_loading_overlay %}
+    <script>
+        // Hide the loading overlay when the asynchronous operation is complete
+        document.getElementById('loadingOverlay').style.display = 'none';
+    </script>
+    {% endif %}
+
+    {% if show_true_modal %}
+    <script>
+        const modal = document.getElementById('authorizationModal');
+        modal.style.display = 'block';
+        const closeButton = modal.querySelector('.close');
+
+        // Close the modal when close button is clicked
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+    </script>
+    {% endif %}
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
