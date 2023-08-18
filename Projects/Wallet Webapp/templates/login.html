@@ -8,7 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Roboto+Mono:ital,wght@600&display=swap" rel="stylesheet">
+    
     <title>Login Authentication</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="center">
@@ -33,14 +35,14 @@
                     {{form.submit}}
                 </div>
 
-                <div class="view">
-                    
-                </div>
-
                 <div class="loading-overlay" id="loadingOverlay">
                     <div class="spinner"></div>
                 </div>
             </form>
+
+            <div class="view">
+                <button id="view-info" class="save-btn" >View Information</button>
+            </div>
         </div>
 
             <!-- Modal -->
@@ -52,6 +54,20 @@
         </div>
 
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#view-info").click(function() {
+                $.ajax({
+                    url: "/info",  
+                    type: "GET" ,
+                    success: function(response) {
+                        console.log("Viewing information");  
+                    }       
+                });
+            });
+        });
+    </script>
     
     {% if hide_loading_overlay %}
     <script>
