@@ -9,6 +9,8 @@ import threading
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "nibirkabir"
 
+apps = []
+
 class LoginForm(FlaskForm):
     api_key = StringField(validators=[InputRequired()], 
                           render_kw={"placeholder" : "Enter API Token"})
@@ -26,13 +28,13 @@ def index():
         thread = threading.Thread(target=asyncio.run, args=(account.do_authorization(),))
         thread.start()
         thread.join()
+        apps.append(account)
 
         return render_template('login.html', form=form, hide_loading_overlay=True, show_true_modal=True)
 
     return render_template('login.html', form=form)
 
-@app.route('/info')
-
+@app.route('/info', methods=['GET', 'POST'])
 def info():
     return render_template('info.html')
 
