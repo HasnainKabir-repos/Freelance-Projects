@@ -8,42 +8,44 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Roboto+Mono:ital,wght@600&display=swap" rel="stylesheet">
-    <title>View Information</title>
+    <title>Balance</title>
 </head>
 <body>
     <div class="center">
         <div class="label">
-            <h2 class="title">View Information</h2>
+            <h2 class="title">Balance Information</h2>
         </div>
 
-        <div class="table-container">
+        <div class="table-container" id="balanceTable" style="display: none;">
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th>API Token</th>
-                        <th>App ID</th>
-                        <th>Status</th>
+                        <th>Email</th>
+                        <th>Login ID</th>
+                        <th>Balance</th>
+                        <th>Wallet</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for account in accounts %}
-
-                    <tr>
-                        <td>{{account.api_token}}</td>
-                        <td>{{account.app_id}}</td>
-                        <td>{{account.status}}</td>
-                    </tr>
-
+                    {% for data in mt5_list %}
+                        <tr>
+                            <td>{{data.mt5.email}}</td>
+                            <td>{{data.mt5.loginid}}</td>
+                            <td>{{data.mt5.balance}}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
+                
             </table>
-
             <div class="view back">
                 <button class="view-btn" id="back-btn">Back</button>
             </div>
         </div>
 
-        
+        <div class="loading-overlay" id="loadingOverlay" style="display: block;">
+            <div class="spinner"></div>
+        </div>
     </div>
 
     <script>
@@ -51,8 +53,14 @@
             console.log('Button clicked');
             window.location.href = "{{ url_for('index') }}";
         });
-    </script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
+        function showContent() {
+            document.getElementById("loadingOverlay").style.display = "none";
+            document.getElementById("balanceTable").style.display = "block";
+        }
+
+        // Call the showContent() function when the page is ready
+        document.addEventListener("DOMContentLoaded", showContent);
+    </script>
 </body>
 </html>

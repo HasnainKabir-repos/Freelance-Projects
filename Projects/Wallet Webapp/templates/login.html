@@ -43,6 +43,10 @@
             <div class="view">
                 <button id="view-info" class="save-btn" >View Information</button>
             </div>
+
+            <div class="view">
+                <button id="balance-info" class="save-btn" >Balance</button>
+            </div>
         </div>
 
             <!-- Modal -->
@@ -54,18 +58,14 @@
         </div>
 
     </div>
-
     <script>
-        $(document).ready(function() {
-            $("#view-info").click(function() {
-                $.ajax({
-                    url: "/info",  
-                    type: "GET" ,
-                    success: function(response) {
-                        console.log("Viewing information");  
-                    }       
-                });
-            });
+        document.getElementById("view-info").addEventListener("click", function() {
+            console.log('Button clicked');
+            window.location.href = "{{ url_for('info') }}";
+        });
+        document.getElementById("balance-info").addEventListener("click", function() {
+            console.log('Button clicked');
+            window.location.href = "{{ url_for('balance') }}";
         });
     </script>
     
