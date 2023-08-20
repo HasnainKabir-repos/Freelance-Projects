@@ -25,7 +25,3 @@ def get_balance(apps):
     thread.start()
     
     return mt5_list
-
-
-
-
