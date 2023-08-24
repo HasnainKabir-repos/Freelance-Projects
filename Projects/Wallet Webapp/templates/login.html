@@ -90,7 +90,29 @@
     </script>
     {% endif %}
 
-
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDqivS5jfo-RuHfEqe_EJmib9MmGj8I1Gk",
+          authDomain: "wallet-webapp.firebaseapp.com",
+          projectId: "wallet-webapp",
+          storageBucket: "wallet-webapp.appspot.com",
+          messagingSenderId: "348378812123",
+          appId: "1:348378812123:web:31769645243459cea806fe",
+          measurementId: "G-C4LGHZKBG2"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

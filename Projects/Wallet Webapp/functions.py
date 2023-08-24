@@ -6,7 +6,9 @@ async def fetch_balance(apps, mt5_list):
     try:
         for account in apps:
             api = account.api
+            #print(api)
             response = await api.mt5_login_list()
+            
             print("Mt5 data fetched successfully")
             
             for i in response:
