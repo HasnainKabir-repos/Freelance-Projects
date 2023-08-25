@@ -6,11 +6,6 @@ from derivbot import Account
 import asyncio
 import threading
 from functions import get_balance
-import firebase_admin
-from firebase_admin import credentials
-
-cred = credentials.Certificate("path/to/serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "nibirkabir"
@@ -62,6 +57,4 @@ def balance():
     return render_template('balance.html', mt5_list=mt5_list)
 
 if __name__ == "__main__":
-    from werkzeug.serving import run_simple
-    run_simple('127.0.0.1', 8000, app)
-    #app.run(debug=True)
+    app.run(debug=True)
