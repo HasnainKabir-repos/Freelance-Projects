@@ -30,11 +30,14 @@
                 <tbody>
                     {% for data in mt5_list %}
                         <tr>
-                            <td>{{data.mt5.email}}</td>
-                            <td>{{data.mt5.loginid}}</td>
-                            <td>{{data.mt5.balance}}</td>
+                            <td>{{data.email}}</td>
+                            <td>{{data.loginid}}</td>
+                            <td>{{data.balance}}</td>
+                            <td>{{data.wallet}}</td>
+                            <td>{{data.total}}</td>
                         </tr>
                     {% endfor %}
+
                 </tbody>
                 
             </table>
