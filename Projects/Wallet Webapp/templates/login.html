@@ -51,6 +51,9 @@
             <div class="view">
                 <button id="balance-info" class="save-btn" >Balance</button>
             </div>
+            <div class="view">
+                <button id="transfer" class="save-btn" >Transfer Funds</button>
+            </div>
         </div>
 
             <!-- Modal -->
@@ -70,6 +73,10 @@
         document.getElementById("balance-info").addEventListener("click", function() {
             console.log('Button clicked');
             window.location.href = "{{ url_for('balance') }}";
+        });
+        document.getElementById("transfer").addEventListener("click", function() {
+            console.log('Button clicked');
+            window.location.href = "{{ url_for('transfer') }}";
         });
     </script>
     

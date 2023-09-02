@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Roboto+Mono:ital,wght@600&display=swap" rel="stylesheet">
+    <title>Transfer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="title">Transfer Funds</h2>
+        
+        <form id="transfer-form">   
+        <div class="user-selector">
+            <h3 class="tag">Username:</h3>
+            <select name="user" class="selector-dropdown" id="userSelector">
+                {% for user in usernames %}
+                    <option class="selector-options" value="{{ user }}">{{ user }}</option>
+                {% endfor %}
+            </select>
+            <div class="user-selector-btn">
+                <a id="select-user" class="view-btn">Select</a>
+            </div>
+            
+        </div>
+        <div class="form-container2">
+            
+            <div class="form-left">
+                <div class="form-group radio-group">
+                    <label class="form-label">From:</label>
+
+                    <div id="group">
+                        {% for option in options %}
+                        <label for="{{ option }}">
+                            {{ option }}
+                            <input type="radio" id="account_from" name="account_from" value="{{ option }}" checked>
+                            
+                        </label>
+                        {% endfor %}
+                    </div> 
+
+                </div>
+            </div>
+            <div class="form-middle">
+                <div class="form-group">
+                    <label class="form-label">Amount to transfer (USD):</label>
+                    <input type="number" name="amount" id="amount" class="form-input amount-input" placeholder="Enter amount">
+                </div>
+                <button id="transfer-button" type="submit" class="transfer-button">Transfer</button>
+                <div class="view back">
+                    <button class="transfer-button" id="back-btn">Back</button>
+                </div>
+            </div>
+            <div class="form-right">
+                <div class="form-group">
+                    <label class="form-label">To:</label>
+                    
+                        <select name="account_to" id="dropdown-group" class="form-input dropdown" name="selectOption">
+                            {% for option in options %}
+                                <option value="{{ option }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+
+
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+        </div>
+
+        <div id="error-modal" class="modal">
+            <div class="modal-content">
+                <span id = "close" class="close">&times;</span>
+                <p>Trying to transfer funds between the same MT5 account</p>
+            </div>
+        </div>
+
+        <div id="success-modal" class="modal">
+            <div class="modal-content" >
+                <span id = "close2" class="close">&times;</span>
+                <p id="modal-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("back-btn").addEventListener("click", function() {
+            console.log('Button clicked');
+            window.location.href = "{{ url_for('index') }}";
+        });
+    </script>
+
+    <script>
+
+        function populateRadioButtons(response){
+            var options = response.options;
+            var container = $("#group")
+            container.empty();
+            
+            for (var i=0; i <options.length; i++){
+                var label = $("<label>").attr("for", options[i]).text(options[i]);
+                var input = $("<input>").attr({
+                    type: "radio",
+                    name: "transferOption",
+                    id: options[i],
+                    value: options[i]
+                });
+
+                label.append(input);
+                container.append(label);   
+            }
+        }
+
+
+        function populateDropdowns(response){
+            var options = response.options;
+            var select = $("#dropdown-group")
+            select.empty();
+
+            for (var i=0; i <options.length; i++){
+                var option = $("<option>").attr({
+                    value: options[i]
+                }).text(options[i]);
+                select.append(option); 
+            }
+        }
+
+        function hideModal(){
+            $("#error-modal").hide();
+           
+        }
+
+        $(document).ready(function () {
+
+            $("#close").click(function () {
+                hideModal();
+            });
+            $("#close2").click(function () {
+                $("#success-modal").hide();
+            });
+
+            $("#select-user").click(function () {
+                var value = $("#userSelector").val();
+
+                $.ajax({
+                    url: '/change_mt5_accounts',
+                    type: 'POST',
+                    data: { user: value},
+                    success: function (response) {
+                        console.log(response);
+                        populateRadioButtons(response);
+                        populateDropdowns(response);
+                    }
+                });
+            });
+
+            $('#transfer-form').submit(function (e) {
+                e.preventDefault();
+                
+                $.ajax({
+                    url: '/process_transfer',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        console.log(response);
+                        $('#modal-text').text(response['message'])
+                        $('#success-modal').show();
+                    }
+                });
+            })
+        });
+    </script>
+
+</body>
+</html>

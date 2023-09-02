@@ -1,8 +1,8 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template,  request, jsonify
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField
 from wtforms.validators import InputRequired
-from derivbot import Account
+from derivbot import Account, Transfer
 import threading
 from functools import wraps
 import websocket
@@ -15,7 +15,9 @@ app.config['SECRET_KEY'] = "nibirkabir"
 socketio = SocketIO(app)
 
 apps = []
-data_received = False
+execution_flag = threading.Event()
+transfer_flag = threading.Event()
+
 def socket_connect(account):
     ws_url = f"wss://frontend.binaryws.com/websockets/v3?l=EN&app_id={account.app_id}"
     
@@ -36,7 +38,13 @@ def socket_connect(account):
 
         handler = MessageHandler(message=message, account=account)
         handler.handle_message()
-        data_received = handler.flag
+        global msg 
+
+        if handler.flag:
+            execution_flag.set()
+        if handler.transfer_status:
+            msg = json.loads(handler.message)
+            transfer_flag.set()
 
     def on_close(ws, close_status_code, close_msg):
         if close_status_code == 1000:
@@ -94,6 +102,7 @@ def prepare_mt5_data(route_function):
     def decorated_function(*args, **kwargs):
         for i in apps:
             i.get_mt5_list()
+            execution_flag.wait()
             for j in i.mt5_list:
                 j.total = i.total
         return route_function(*args, **kwargs)
@@ -107,6 +116,54 @@ def balance():
        mt5_lst.extend(i.mt5_list)
 
     return render_template('balance.html', mt5_list=mt5_lst, loader=False)
+
+def process_users():
+    usernames = []
+    for i in apps:
+        for j in i.mt5_list:
+            if j.email not in usernames:
+                usernames.append(j.email)
+    return usernames
+
+def process_options(username):
+    options=[]
+    for i in apps:
+        for j in i.mt5_list:
+            if j.email == username:
+                options.append(j.loginid)
+    return options
+
+@app.route('/transfer')
+def transfer():
+    balance()
+    usernames = process_users()
+    options = []
+    if len(usernames) > 0:
+        options = process_options(usernames[0])
+    return render_template('transfer.html', options=options, usernames=usernames)
+
+@app.route('/change_mt5_accounts', methods=['POST'])
+def change_mt5_accounts():
+    user = request.form.get('user')
+    options = process_options(user)
+    return jsonify({'options': options})
+
+@app.route('/process_transfer', methods=['POST'])
+def process_transfer():
+    username = request.form.get('user');
+    account_from = request.form.get('account_from')
+    amount = int(request.form.get('amount'))
+    account_to = request.form.get('account_to')
+
+    transfer = Transfer(username, account_from, account_to, amount)
+    transfer.transfer(apps)
+    transfer_flag.wait()
+
+    if msg and msg['error']:
+        err = msg['error']['message']
+        return jsonify({"message": err})
+    else:
+        return jsonify({"message":"Transferred Funds Successfully"})
 
 if __name__ == "__main__":
     app.run(debug=True)
