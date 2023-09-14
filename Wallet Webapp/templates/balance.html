@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Roboto+Mono:ital,wght@600&display=swap" rel="stylesheet">
+    <title>Balance</title>
+</head>
+<body>
+    <div class="center">
+        <div class="label">
+            <h2 class="title">Balance Information</h2>
+        </div>
+
+        <div class="table-container" id="balanceTable" style="display: none;">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Login ID</th>
+                        <th>Balance</th>
+                        <th>Wallet</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in mt5_list %}
+                        <tr>
+                            <td>{{data.email}}</td>
+                            <td>{{data.loginid}}</td>
+                            <td>{{data.balance}}</td>
+                            <td>{{data.wallet}}</td>
+                            <td>{{data.total}}</td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+                
+            </table>
+            <div class="view back">
+                <button class="view-btn" id="back-btn">Back</button>
+            </div>
+        </div>
+
+        <div class="loading-overlay" id="loadingOverlay" style="display: block;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("back-btn").addEventListener("click", function() {
+            console.log('Button clicked');
+            window.location.href = "{{ url_for('index') }}";
+        });
+
+        function showContent() {
+            document.getElementById("loadingOverlay").style.display = "none";
+            document.getElementById("balanceTable").style.display = "block";
+        }
+
+        // Call the showContent() function when the page is ready
+        document.addEventListener("DOMContentLoaded", showContent);
+    </script>
+</body>
+</html>

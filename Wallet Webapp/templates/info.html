@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Roboto+Mono:ital,wght@600&display=swap" rel="stylesheet">
+    <title>View Information</title>
+</head>
+<body>
+    <div class="center">
+        <div class="label">
+            <h2 class="title">View Information</h2>
+        </div>
+
+        <div class="table-container">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>API Token</th>
+                        <th>App ID</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+
+                    <tr>
+                        <td>{{account.api_token}}</td>
+                        <td>{{account.app_id}}</td>
+                        <td>{{account.status}}</td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="view back">
+                <button class="view-btn" id="back-btn">Back</button>
+            </div>
+        </div>
+
+        
+    </div>
+
+    <script>
+        document.getElementById("back-btn").addEventListener("click", function() {
+            console.log('Button clicked');
+            window.location.href = "{{ url_for('index') }}";
+        });
+    </script>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
